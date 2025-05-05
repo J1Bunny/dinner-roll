@@ -10,20 +10,23 @@ function CheckboxList({ options }) {
     setCheckedItems((prevState) => ({ ...prevState, [name]: checked }));
   };
 
-  const handleGenerateAllRandomOptions = () => {
-    const newRandomOptions = {};
+  const handleRoll = () => {
+    const newRandomOptions = { ...randomOptions };
     options.forEach((option) => {
+      const isChecked = checkedItems[option.value] || false;
       const dieOptionsString = option.dieOptions;
-      if (dieOptionsString) {
-        const optionsArray = dieOptionsString.split(',').map(opt => opt.trim());
-        if (optionsArray.length > 0) {
-          const randomIndex = Math.floor(Math.random() * optionsArray.length);
-          newRandomOptions[option.value] = optionsArray[randomIndex];
+      if (!isChecked) {
+        if (dieOptionsString) {
+          const optionsArray = dieOptionsString.split(',').map(opt => opt.trim());
+          if (optionsArray.length > 0) {
+            const randomIndex = Math.floor(Math.random() * optionsArray.length);
+            newRandomOptions[option.value] = optionsArray[randomIndex];
+          } else {
+            newRandomOptions[option.value] = 'No options';
+          }
         } else {
-          newRandomOptions[option.value] = 'No options';
+          newRandomOptions[option.value] = 'No options list';
         }
-      } else {
-        newRandomOptions[option.value] = 'No options list';
       }
     });
     setRandomOptions(newRandomOptions);
@@ -31,8 +34,6 @@ function CheckboxList({ options }) {
 
   return (
     <div className="checkbox-list">
-      <button onClick={handleGenerateAllRandomOptions}>Roll</button>
-      <br></br>
       {options.map((option) => (
         <div key={option.value}>
           <input
@@ -47,6 +48,9 @@ function CheckboxList({ options }) {
           )}
         </div>
       ))}
+      <br></br>
+      <button onClick={handleRoll}>Roll</button>
+      <br></br>
     </div>
   );
 }
@@ -69,7 +73,7 @@ function App() {
   React.useEffect(() => {
     setDynamicOptions(
       Array.from({ length: numberOfCheckboxes }, (_, index) => ({
-        label: diceList[index]?.dieType || `Option ${index + 1}`,
+        label: diceList[index]?.dieType,
         value: `dynamicOption${index + 1}`,
         dieOptions: diceList[index]?.dieOptions || '', // Pass dieOptions to the options array
       }))
